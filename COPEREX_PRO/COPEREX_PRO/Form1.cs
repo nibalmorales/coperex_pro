@@ -225,9 +225,6 @@ namespace COPEREX_PRO
                 KeyValuePair<int, string> clienteSeleccionado = (KeyValuePair<int, string>)cmbCliente.SelectedItem;
 
                 String tipo = cmbTipo.SelectedIndex.ToString();
-                //DateTime fecha = DateTime.ParseExact(dtFecha.Value.ToString("dd/MM/yyyy"), "dd/MM/yyyy", CultureInfo.InvariantCulture);
-                //String fechaSinHora = fecha.ToString().Replace("00:00:00", "");
-
                 DateTime fechaSinHora = dtFecha.Value.Date;
                 string fechaFormateada = fechaSinHora.ToString("dd/MM/yyyy");
 
@@ -240,7 +237,7 @@ namespace COPEREX_PRO
 
                 movimiento.id_producto = idProducto;
                 movimiento.id_cliente = idCliente;
-                movimiento.tipo = "Compra";//tipo;
+                movimiento.tipo = tipo;
                 movimiento.cantidad = cantidad;
                 movimiento.fecha = fechaSinHora;
 

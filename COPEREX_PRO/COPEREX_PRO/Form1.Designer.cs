@@ -144,8 +144,8 @@
             // 
             this.cmbTipo.FormattingEnabled = true;
             this.cmbTipo.Items.AddRange(new object[] {
-            "Entrada",
-            "Salida"});
+            "COMPRA",
+            "VENTA"});
             this.cmbTipo.Location = new System.Drawing.Point(127, 180);
             this.cmbTipo.Name = "cmbTipo";
             this.cmbTipo.Size = new System.Drawing.Size(372, 24);
