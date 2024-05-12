@@ -1,0 +1,7 @@
+C:\Users\Anibal\documents\visual studio 2015\Projects\COPEREX_PRO\Controlador\bin\Debug\Controlador.dll
+C:\Users\Anibal\documents\visual studio 2015\Projects\COPEREX_PRO\Controlador\bin\Debug\Controlador.pdb
+C:\Users\Anibal\documents\visual studio 2015\Projects\COPEREX_PRO\Controlador\bin\Debug\Modelo.dll
+C:\Users\Anibal\documents\visual studio 2015\Projects\COPEREX_PRO\Controlador\bin\Debug\Modelo.pdb
+C:\Users\Anibal\documents\visual studio 2015\Projects\COPEREX_PRO\Controlador\obj\Debug\Controlador.csprojResolveAssemblyReference.cache
+C:\Users\Anibal\documents\visual studio 2015\Projects\COPEREX_PRO\Controlador\obj\Debug\Controlador.dll
+C:\Users\Anibal\documents\visual studio 2015\Projects\COPEREX_PRO\Controlador\obj\Debug\Controlador.pdb

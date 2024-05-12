@@ -1,0 +1,4 @@
+C:\Users\Anibal\documents\visual studio 2015\Projects\COPEREX_PRO\Modelo\bin\Debug\Modelo.dll
+C:\Users\Anibal\documents\visual studio 2015\Projects\COPEREX_PRO\Modelo\bin\Debug\Modelo.pdb
+C:\Users\Anibal\documents\visual studio 2015\Projects\COPEREX_PRO\Modelo\obj\Debug\Modelo.dll
+C:\Users\Anibal\documents\visual studio 2015\Projects\COPEREX_PRO\Modelo\obj\Debug\Modelo.pdb
