@@ -1,0 +1,242 @@
+CREATE DATABASE COPEREXDB
+GO
+USE COPEREXDB
+GO
+
+
+
+CREATE TABLE TBL_CLIENTE (
+    ID_CLIENTE INT PRIMARY KEY IDENTITY(1,1),
+    NOMBRE VARCHAR(100),
+    DIRECCION VARCHAR(255),
+    TELEFONO VARCHAR(20)
+);
+
+CREATE TABLE TBL_PRODUCTO (
+    ID_PRODUCTO INT PRIMARY KEY IDENTITY(1,1),
+	CODIGO INT,
+    NOMBRE VARCHAR(100),
+    DESCRIPCION VARCHAR(255),
+    PRECIO DECIMAL(10, 2)
+);
+
+CREATE TABLE TBL_MOVIMIENTO (
+    ID_MOVIMIENTO INT PRIMARY KEY IDENTITY(1,1),
+    ID_PRODUCTO INT,
+    ID_CLIENTE INT,
+    FECHA DATE,
+    TIPO VARCHAR(10), -- Puede ser 'Entrada' o 'Salida'
+    CANTIDAD INT,
+    FOREIGN KEY (ID_CLIENTE) REFERENCES TBL_CLIENTE(ID_CLIENTE)
+);
+
+CREATE TABLE DETALLE_MOVIMIENTO (
+    ID_DETALLE INT PRIMARY KEY IDENTITY(1,1),
+    ID_CLIENTE INT,
+    ID_PRODUCTO INT,
+    ID_MOVIMIENTO INT,
+    FOREIGN KEY (ID_PRODUCTO) REFERENCES TBL_PRODUCTO(ID_PRODUCTO),
+    FOREIGN KEY (ID_MOVIMIENTO) REFERENCES TBL_MOVIMIENTO(ID_MOVIMIENTO)
+);
+
+
+-- Insertar datos en TBL_CLIENTE
+INSERT INTO TBL_CLIENTE (NOMBRE, DIRECCION, TELEFONO)
+VALUES 
+('ANIBAL MORALES',	'ZONA 01, GUATEMALA', '4145-3569'),
+('NAOMI CHANG',		'ZONA 10, GUATEMALA', '9887-8966'),
+('VALERIA LOPEZ',	'ZONA 12, GUATEMALA', '5555-8742'),
+('ROSA GOMEZ',		'ZONA 07, GUATEMALA', '9254-8755'),
+('CARLOS CASTILLO', 'ZONA 14, GUATEMALA', '5874-9854');
+
+-- Insertar datos en TBL_PRODUCTO
+INSERT INTO TBL_PRODUCTO (CODIGO, NOMBRE, DESCRIPCION, PRECIO)
+VALUES 
+(101, 'LAPTOP',     'COLOR GRIS CON TECLADO NUMERICO EXTRA', 4000.99),
+(102, 'MONITOR',    '21 PULGDAS CON CABLE HDMI'             , 870.50),
+(103, 'MOUSE',      'BLUETOOTH, ORTOPEDICO'				     ,110.75),
+(104, 'VENTILADOR', 'BASE PARA LAPTOP CON CABLE USB'	    , 135.25),
+(105, 'TABLET',     'CON PROTECTOR Y PANTALLA EXTRA'	    , 2500.00);
+
+-- Insertar datos en TBL_MOVIMIENTO
+INSERT INTO TBL_MOVIMIENTO (ID_PRODUCTO, ID_CLIENTE, FECHA, TIPO, CANTIDAD)
+VALUES 
+(1, 1, '2024-05-04', 'Compra', 10),
+(2, 2, '2024-05-04', 'Venta', 5),
+(3, 3, '2024-05-04', 'Compra', 20),
+(4, 4, '2024-05-04', 'Venta', 15),
+(5, 5, '2024-05-04', 'Compra', 25);
+
+-- Insertar datos en DETALLE_MOVIMIENTO
+INSERT INTO DETALLE_MOVIMIENTO (ID_CLIENTE, ID_PRODUCTO, ID_MOVIMIENTO)
+VALUES 
+(1, 1, 1),
+(2, 2, 2),
+(3, 3, 3),
+(4, 4, 4),
+(5, 5, 5);
+
+
+ALTER PROCEDURE SPProducto
+@opc int,
+@CODIGO int = null,
+@NOMBRE varchar(100) = null,
+@DESCRIPCION VARCHAR(255) = null,
+@PRECIO decimal(10,2) = null,
+@ID_PRODUCTO int = null
+
+AS
+BEGIN
+    IF @opc = 1
+    BEGIN
+        SELECT codigo,nombre,descripcion,precio,ID_Producto FROM TBL_PRODUCTO;
+    END
+    ELSE IF @opc = 2
+    BEGIN
+        INSERT INTO TBL_PRODUCTO (CODIGO, NOMBRE, DESCRIPCION, PRECIO)
+        VALUES (@CODIGO, @NOMBRE, @DESCRIPCION, @PRECIO);
+    END
+    ELSE IF @opc = 3
+    BEGIN
+        UPDATE TBL_PRODUCTO
+        SET 
+            CODIGO = ISNULL(@CODIGO, CODIGO),
+            NOMBRE = ISNULL(@NOMBRE, NOMBRE),
+            DESCRIPCION = ISNULL(@DESCRIPCION, DESCRIPCION),
+            PRECIO = ISNULL(@PRECIO, PRECIO)
+        WHERE ID_PRODUCTO = @ID_PRODUCTO;
+    END
+    ELSE IF @opc = 4
+    BEGIN
+	    DELETE FROM DETALLE_MOVIMIENTO WHERE ID_PRODUCTO = @ID_PRODUCTO;
+        DELETE FROM TBL_PRODUCTO WHERE ID_PRODUCTO = @ID_PRODUCTO;
+    END
+	ELSE IF @opc = 5
+    BEGIN
+        SELECT * FROM TBL_PRODUCTO WHERE ID_PRODUCTO = @ID_PRODUCTO;
+    END
+END;
+
+
+
+CREATE PROCEDURE SP_MovimientosEntrada
+AS
+BEGIN
+    SELECT 
+		   m.Fecha AS FECHA,
+		   c.Nombre AS Cliente,
+           p.Nombre AS Producto,
+		   m.tipo AS Detalle,
+		   m.Cantidad AS Cantidad,
+		   p.PRECIO AS [Valor Unitario], 
+		   p.PRECIO*m.CANTIDAD AS [Valor Total] 
+    FROM TBL_Movimiento m
+    JOIN TBL_Cliente c ON m.ID_Cliente = c.ID_Cliente
+    JOIN TBL_Producto p ON m.ID_Producto = p.ID_Producto
+    WHERE m.Tipo = 'Compra';
+END;
+
+CREATE PROCEDURE SP_MovimientosSalida
+AS
+BEGIN
+    SELECT 
+		   m.Fecha AS FECHA,
+		   c.Nombre AS Cliente,
+           p.Nombre AS Producto,
+		   m.tipo AS Detalle,
+		   m.Cantidad AS Cantidad,
+		   p.PRECIO AS [Valor Unitario], 
+		   p.PRECIO*m.CANTIDAD AS [Valor Total] 
+    FROM TBL_Movimiento m
+    JOIN TBL_Cliente c ON m.ID_Cliente = c.ID_Cliente
+    JOIN TBL_Producto p ON m.ID_Producto = p.ID_Producto
+    WHERE m.Tipo = 'Venta';
+END;
+
+
+CREATE PROCEDURE SP_Movimientos
+AS
+BEGIN
+    SELECT 
+        m.Fecha AS FECHA,
+        c.Nombre AS Cliente,
+        p.Nombre AS Producto,
+        CASE WHEN m.Tipo = 'Venta' THEN 'Venta' ELSE 'Compra' END AS Detalle,
+        m.Cantidad AS Cantidad,
+        p.PRECIO AS [Valor Unitario], 
+        p.PRECIO * m.Cantidad AS [Valor Total] 
+    FROM TBL_Movimiento m
+    JOIN TBL_Cliente c ON m.ID_Cliente = c.ID_Cliente
+    JOIN TBL_Producto p ON m.ID_Producto = p.ID_Producto
+    WHERE m.Tipo IN ('Venta', 'Compra')
+    ORDER BY m.Fecha; -- Ordenar por fecha
+END;
+
+
+
+CREATE PROCEDURE SPCliente
+@opc int,
+@NOMBRE varchar(100) = null,
+@DIRECCION VARCHAR(255) = null,
+@TELEFONO VARCHAR(20) = null,
+@ID_CLIENTE int = null
+
+AS
+BEGIN
+    IF @opc = 1
+    BEGIN
+        SELECT * FROM  TBL_CLIENTE;
+    END
+    ELSE IF @opc = 2
+    BEGIN
+        INSERT INTO  TBL_CLIENTE(NOMBRE,DIRECCION,TELEFONO)
+        VALUES (@NOMBRE, @DIRECCION, @TELEFONO);
+    END
+    ELSE IF @opc = 3
+    BEGIN
+        UPDATE TBL_CLIENTE
+        SET 
+            NOMBRE = ISNULL(@NOMBRE, NOMBRE),
+            DIRECCION = ISNULL(@DIRECCION, DIRECCION),
+            TELEFONO = ISNULL(@TELEFONO, TELEFONO)
+        WHERE ID_CLIENTE = @ID_CLIENTE;
+    END
+    ELSE IF @opc = 4
+    BEGIN
+        DELETE FROM TBL_CLIENTE WHERE ID_CLIENTE = @ID_CLIENTE;
+    END
+	ELSE IF @opc = 5
+    BEGIN
+        SELECT * FROM TBL_CLIENTE WHERE ID_CLIENTE = @ID_CLIENTE;
+    END
+END;
+
+CREATE PROCEDURE SPMovimiento
+@opc int,
+@ID_PRODUCTO int = null,
+@ID_CLIENTE int = null,
+@FECHA DATE = null,
+@TIPO varchar(10) = null,
+@CANTIDAD int = null,
+@ID_MOVIMIENTO int = null
+
+AS
+BEGIN
+    IF @opc = 1
+    BEGIN
+        SELECT * FROM  TBL_MOVIMIENTO ;
+    END
+    ELSE IF @opc = 2
+    BEGIN
+        INSERT INTO  TBL_MOVIMIENTO (ID_PRODUCTO, ID_CLIENTE,FECHA,TIPO,CANTIDAD)
+        VALUES (@ID_PRODUCTO,@ID_CLIENTE,@FECHA,@TIPO,@CANTIDAD);
+    END
+    ELSE IF @opc = 4
+    BEGIN
+        DELETE FROM TBL_MOVIMIENTO  WHERE ID_MOVIMIENTO = @ID_MOVIMIENTO;
+    END
+	ELSE IF @opc = 5
+    BEGIN
+        SELECT * FROM TBL_MOVIMIENTO  WHERE ID_MOVIMIENTO = @ID_MOVIMIENTO;
+    END
+END;
